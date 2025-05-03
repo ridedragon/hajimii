@@ -1,11 +1,11 @@
 name: Docker Image CI for GHCR
 
-on:  
-  schedule:
-    - cron: '0 */6 * * *'
+on:
   push:
     branches: [main]
   workflow_dispatch:
+
+# 其他部分保持不变...
 
 jobs:
   build-and-push:
