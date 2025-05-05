@@ -18,7 +18,7 @@
 
 - [错误自查](./wiki/error.md)
 ###  使用文档
-- [huggingface 部署的使用文档（服务器出现问题，暂时不推荐）](./wiki/huggingface.md)
+- [huggingface 部署的使用文档（复活？！）（推荐，免费，手机电脑均可使用）](./wiki/huggingface.md)
 - [上面看不到图的看这里](https://blog.rzline.eu.org/2025/04/29/HuggingFace%E9%83%A8%E7%BD%B2Gemini%E8%BD%AE%E8%AF%A2%E9%A1%B9%E7%9B%AEHajimi)
 
 - [Claw Cloud部署的使用文档（推荐，免费，手机电脑均可使用）](./wiki/claw.md) 感谢[@IDeposit](https://github.com/IDeposit)编写
@@ -34,13 +34,12 @@
 
 ###  更新日志
 * v0.2.3
-    * 暂略
-* v0.2.2
-    * 实现函数调用支持，包括流式和非流式函数调用
-    * 修复了dockerfile不使用uv的问题
-    * 修复了SKIP_CHECK_API_KEY环境变量相关问题
-    * 采用最后8条消息计算缓存键，提升缓存效率
-    * 新增key后，如果之前的模型列表为空，会自动拉取模型列表，因此现在不需要在环境变量中预先添加key，可以直接在前端界面添加使用
+   * 优化了负载均衡策略
+   * 重构了持久化模块
+   * 新增了模型白名单和请求头白名单模式，对应环境变量`WHITELIST_MODELS`和`WHITELIST_USER_AGENT`
+   * 修复了夜间模式下文字颜色显示不正确的问题
+   * 前端新增了对 API Key 可用性的检查功能
+   * 修复了若干已知问题
 
 * 历史版本更新日志请查看[update](./update.md)
 
