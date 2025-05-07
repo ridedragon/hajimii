@@ -72,9 +72,9 @@ async def verify_user_agent(request: Request):
     if request.headers.get("User-Agent") not in settings.WHITELIST_USER_AGENT:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not allowed client")
 
-def get_cached(cache_key,is_stream: bool):
+async def get_cached(cache_key,is_stream: bool):
     # 检查缓存是否存在，如果存在，返回缓存
-    cached_response, cache_hit = response_cache_manager.get_and_remove(cache_key)
+    cached_response, cache_hit = await response_cache_manager.get_and_remove(cache_key)
     
     if cache_hit and cached_response:
         log('info', f"缓存命中: {cache_key[:8]}...", 
@@ -91,10 +91,7 @@ def get_cached(cache_key,is_stream: bool):
 @router.get("/aistudio/models",response_model=ModelList)
 async def aistudio_list_models(_ = Depends(custom_verify_password),
                                _2 = Depends(verify_user_agent)):
-    # 使用原有的Gemini实现
-    if settings.PUBLIC_MODE:
-        filtered_models = ["gemini-2.5-pro-exp-03-25","gemini-2.5-flash-preview-04-17"]
-    elif settings.WHITELIST_MODELS:
+    if settings.WHITELIST_MODELS:
         filtered_models = [model for model in GeminiClient.AVAILABLE_MODELS if model in settings.WHITELIST_MODELS]
     else:
         filtered_models = [model for model in GeminiClient.AVAILABLE_MODELS if model not in settings.BLOCKED_MODELS]
@@ -152,7 +149,7 @@ async def aistudio_chat_completions(request: ChatCompletionRequest, http_request
         extra={'request_type': 'non-stream', 'model': request.model})
     
     # 检查缓存是否存在，如果存在，返回缓存
-    cached_response = get_cached(cache_key, is_stream = request.stream)
+    cached_response = await  get_cached(cache_key, is_stream = request.stream)
     if cached_response :
         return cached_response
     
@@ -235,12 +232,12 @@ async def aistudio_chat_completions(request: ChatCompletionRequest, http_request
             active_requests_manager.remove(pool_key)
         
         # 检查是否已有缓存的结果（可能是由另一个任务创建的）
-        cached_response = get_cached(cache_key, is_stream = request.stream)
+        cached_response = await get_cached(cache_key, is_stream = request.stream)
         if cached_response :
             return cached_response
         
         # 发送错误信息给客户端
-        raise HTTPException(status_code=500, detail=f" hajimi 服务器内部处理时发生错误")
+        raise HTTPException(status_code=500, detail=f" hajimi 服务器内部处理时发生错误\n具体原因:{e}")
 
 @router.post("/vertex/chat/completions", response_model=ChatCompletionResponse)
 async def vertex_chat_completions(request: ChatCompletionRequest, http_request: Request,
